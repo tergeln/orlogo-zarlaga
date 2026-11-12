@@ -83,6 +83,37 @@ class Bill {
   }
 }
 
+/// Хадгалсан карт. Бүтэн дугаар, CVC хадгалагдахгүй.
+class SavedCard {
+  final String id;
+  final String brand;
+  final String holder;
+  final String last4;
+  final String expiry;
+
+  const SavedCard({
+    required this.id,
+    required this.brand,
+    required this.holder,
+    required this.last4,
+    required this.expiry,
+  });
+
+  String get masked => '•••• •••• •••• $last4';
+  String get label => '$brand •••• $last4';
+
+  factory SavedCard.fromDoc(QueryDocumentSnapshot<Map<String, dynamic>> d) {
+    final m = d.data();
+    return SavedCard(
+      id: d.id,
+      brand: (m['brand'] ?? 'VISA') as String,
+      holder: (m['holder'] ?? '') as String,
+      last4: (m['last4'] ?? '') as String,
+      expiry: (m['expiry'] ?? '') as String,
+    );
+  }
+}
+
 /// Төлбөрийн баримт.
 class Receipt {
   final String id;

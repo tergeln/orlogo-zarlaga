@@ -44,12 +44,21 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
         alignment: Alignment.center,
-        child: const Text(
-          'Сайн уу?',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 50,
-            fontWeight: FontWeight.w700,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 900),
+          curve: Curves.easeOutBack,
+          builder: (_, t, child) => Opacity(
+            opacity: t.clamp(0.0, 1.0).toDouble(),
+            child: Transform.scale(scale: 0.8 + 0.2 * t, child: child),
+          ),
+          child: const Text(
+            'Сайн уу?',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 50,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),

@@ -5,6 +5,9 @@ import '../services/auth_service.dart';
 import '../services/db.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import '../widgets/motion.dart';
+import 'add_expense_screen.dart';
+import 'connect_wallet_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -141,7 +144,7 @@ class _BalanceCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6),
-        Text(money(value),
+        AnimatedMoney(value,
             style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -168,24 +171,43 @@ class _BalanceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Text('Нийт үлдэгдэл',
+              const Text('Нийт үлдэгдэл',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w600)),
-              SizedBox(width: 4),
-              Icon(Icons.keyboard_arrow_up, color: Colors.white, size: 18),
-              Spacer(),
-              Icon(Icons.more_horiz, color: Colors.white),
+              const SizedBox(width: 4),
+              const Icon(Icons.keyboard_arrow_up,
+                  color: Colors.white, size: 18),
+              const Spacer(),
+              SizedBox(
+                height: 28,
+                child: PopupMenuButton<int>(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(Icons.more_horiz, color: Colors.white),
+                  color: Colors.white,
+                  onSelected: (v) => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => v == 0
+                          ? const ConnectWalletScreen()
+                          : const AddExpenseScreen(),
+                    ),
+                  ),
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 0, child: Text('Түрийвч цэнэглэх')),
+                    PopupMenuItem(value: 1, child: Text('Гүйлгээ нэмэх')),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: Text(money(totals.balance),
+            child: AnimatedMoney(totals.balance,
                 style: const TextStyle(
                     color: Colors.white,
                     fontSize: 30,

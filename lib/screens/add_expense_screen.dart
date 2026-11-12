@@ -131,10 +131,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600)),
                       ),
-                      const SizedBox(
-                        width: 48,
-                        child: Icon(Icons.more_horiz, color: Colors.white),
-                      ),
+                      const SizedBox(width: 48, child: HeaderMoreButton()),
                     ],
                   ),
                 ),

@@ -57,6 +57,22 @@ class Db {
       _user.collection('bills').orderBy('dueDate').snapshots().map(
           (s) => s.docs.map(Bill.fromDoc).where((b) => !b.paid).toList());
 
+  /// Шинэ хүлээгдэж буй төлбөр нэмэх.
+  static Future<void> addBill({
+    required String name,
+    required double price,
+    required double fee,
+    required DateTime dueDate,
+  }) {
+    return _user.collection('bills').add({
+      'name': name,
+      'price': price,
+      'fee': fee,
+      'dueDate': Timestamp.fromDate(dueDate),
+      'paid': false,
+    });
+  }
+
   static Stream<List<Receipt>> receipts() => _user
       .collection('receipts')
       .orderBy('paidAt', descending: true)
@@ -90,17 +106,29 @@ class Db {
 
   /// Картын мэдээллээс зөвхөн эзэмшигчийн нэр, сүүлийн 4 орон, хугацааг хадгална.
   static Future<void> saveCard({
+    required String brand,
     required String holder,
     required String last4,
     required String expiry,
   }) {
-    return _user.collection('cards').doc(last4).set({
+    return _user.collection('cards').doc('${brand}_$last4').set({
+      'brand': brand,
       'holder': holder,
       'last4': last4,
       'expiry': expiry,
       'updatedAt': Timestamp.fromDate(DateTime.now()),
     });
   }
+
+  /// Хадгалсан бүх карт, сүүлд нэмсэн нь эхэндээ.
+  static Stream<List<SavedCard>> cards() => _user
+      .collection('cards')
+      .orderBy('updatedAt', descending: true)
+      .snapshots()
+      .map((s) => s.docs.map(SavedCard.fromDoc).toList());
+
+  static Future<void> deleteCard(String id) =>
+      _user.collection('cards').doc(id).delete();
 
   /// Төлбөр төлөх: зарлагын гүйлгээ + баримт үүсгэж, төлбөрийг төлөгдсөн болгоно.
   static Future<Receipt> payBill(Bill bill, String method) async {

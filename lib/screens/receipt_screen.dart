@@ -43,7 +43,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     final r = widget.receipt;
     return PageScaffold(
       title: 'Bill Payment',
-      action: const Icon(Icons.more_horiz, color: Colors.white),
+      action: const HeaderMoreButton(),
       navIndex: 2,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
@@ -59,14 +59,21 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 14, color: AppColors.grey)),
           const SizedBox(height: 10),
-          const Center(
-            child: CircleAvatar(
-              radius: 20,
-              backgroundColor: AppColors.tile,
-              child: CircleAvatar(
-                radius: 14,
-                backgroundColor: AppColors.primary,
-                child: Icon(Icons.check, color: Colors.white, size: 18),
+          Center(
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 700),
+              curve: Curves.elasticOut,
+              builder: (_, t, child) =>
+                  Transform.scale(scale: t, child: child),
+              child: const CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.tile,
+                child: CircleAvatar(
+                  radius: 14,
+                  backgroundColor: AppColors.primary,
+                  child: Icon(Icons.check, color: Colors.white, size: 18),
+                ),
               ),
             ),
           ),

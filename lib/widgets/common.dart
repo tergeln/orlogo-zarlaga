@@ -3,7 +3,9 @@ import 'dart:ui' show PathMetric;
 import 'package:flutter/material.dart';
 
 import '../models.dart';
+import '../services/db.dart';
 import '../theme.dart';
+import 'motion.dart';
 
 /// Доод цэсний идэвхтэй таб (0 нүүр, 1 статистик, 2 түрийвч, 3 профайл).
 final ValueNotifier<int> tabIndex = ValueNotifier<int>(0);
@@ -59,11 +61,79 @@ class HeaderBackground extends StatelessWidget {
   }
 }
 
+/// Хонхны товч: хүлээгдэж буй төлбөрүүдийг мэдэгдэл болгон харуулна.
 class BellButton extends StatelessWidget {
   const BellButton({super.key});
 
+  void _open(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: Colors.white,
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 0, 22, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Мэдэгдэл',
+                  style:
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              Flexible(
+                child: StreamBuilder<List<Bill>>(
+                  stream: Db.pendingBills(),
+                  builder: (context, snap) {
+                    if (snap.hasError) {
+                      return EmptyState('Алдаа: ${snap.error}',
+                          icon: Icons.error_outline);
+                    }
+                    if (!snap.hasData) {
+                      return const Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    final bills = snap.data!;
+                    if (bills.isEmpty) {
+                      return const EmptyState('Шинэ мэдэгдэл алга.',
+                          icon: Icons.notifications_none);
+                    }
+                    return ListView(
+                      shrinkWrap: true,
+                      children: [
+                        for (final b in bills)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: BrandLogo(b.name),
+                            title: Text('${b.name} төлбөр хүлээгдэж байна',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500)),
+                            subtitle: Text(
+                                '${shortDate(b.dueDate)} хүртэл · ${money(b.total)}'),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _open(context),
+      child: _bell(),
+    );
+  }
+
+  Widget _bell() {
     return Container(
       width: 40,
       height: 40,
@@ -89,6 +159,29 @@ class BellButton extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Толгой хэсгийн "•••" товч: хурдан шилжих цэс.
+class HeaderMoreButton extends StatelessWidget {
+  const HeaderMoreButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<int>(
+      icon: const Icon(Icons.more_horiz, color: Colors.white),
+      color: Colors.white,
+      onSelected: (index) {
+        tabIndex.value = index;
+        Navigator.of(context).popUntil((r) => r.isFirst);
+      },
+      itemBuilder: (_) => const [
+        PopupMenuItem(value: 0, child: Text('Нүүр хуудас')),
+        PopupMenuItem(value: 1, child: Text('Статистик')),
+        PopupMenuItem(value: 2, child: Text('Түрийвч')),
+        PopupMenuItem(value: 3, child: Text('Профайл')),
+      ],
     );
   }
 }
@@ -234,7 +327,7 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressScale(
       onTap: loading ? null : onPressed,
       child: Container(
         height: 60,

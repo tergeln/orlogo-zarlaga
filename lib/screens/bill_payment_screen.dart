@@ -50,7 +50,7 @@ class _BillPaymentScreenState extends State<BillPaymentScreen> {
     final bill = widget.bill;
     return PageScaffold(
       title: 'Bill Payment',
-      action: const Icon(Icons.more_horiz, color: Colors.white),
+      action: const HeaderMoreButton(),
       navIndex: 2,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(22, 34, 22, 24),
