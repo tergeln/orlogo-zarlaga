@@ -114,7 +114,9 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
             child: QrImageView(
               data: r.qrData,
               version: QrVersions.auto,
-              size: 130,
+              size: 190,
+              padding: const EdgeInsets.all(12),
+              errorCorrectionLevel: QrErrorCorrectLevel.M,
               backgroundColor: Colors.white,
             ),
           ),

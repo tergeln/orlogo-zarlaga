@@ -129,14 +129,24 @@ class Receipt {
     );
   }
 
-  /// QR код дотор хадгалагдах текст.
-  String get qrData => [
-        'RECEIPT:$number',
-        'ITEM:$billName',
-        'PRICE:${price.toStringAsFixed(2)}',
-        'FEE:${fee.toStringAsFixed(2)}',
-        'TOTAL:${total.toStringAsFixed(2)}',
-        'METHOD:$method',
-        'DATE:${paidAt.toIso8601String()}',
-      ].join('\n');
+  /// QR код дотор хадгалагдах текст. Сканнерууд найдвартай уншдаг байхын тулд
+  /// зөвхөн латин үсэг ашиглана.
+  String get qrData {
+    String two(int v) => v.toString().padLeft(2, '0');
+    final date = '${paidAt.year}-${two(paidAt.month)}-${two(paidAt.day)} '
+        '${two(paidAt.hour)}:${two(paidAt.minute)}';
+    final methodLatin = method == 'Түрийвч' ? 'Wallet' : 'Debit card';
+    final item = billName.replaceAll(RegExp(r'[^\x20-\x7E]'), '?');
+    return [
+      'ORLOGO ZARLAGA - RECEIPT',
+      'No: $number',
+      'Item: $item',
+      'Price: \$${price.toStringAsFixed(2)}',
+      'Fee: \$${fee.toStringAsFixed(2)}',
+      'Total: \$${total.toStringAsFixed(2)}',
+      'Paid by: $methodLatin',
+      'Date: $date',
+      'Status: Paid',
+    ].join('\n');
+  }
 }
